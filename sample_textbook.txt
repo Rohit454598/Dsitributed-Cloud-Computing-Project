@@ -1,0 +1,44 @@
+Indus Valley Civilization
+
+The Indus Valley Civilization (c. 3300–1300 BCE) was one of the world's earliest urban civilizations.
+It developed along the Indus River and nearby regions in present-day Pakistan and northwest India.
+
+Urban Planning
+Cities such as Mohenjo-Daro and Harappa had carefully planned grid layouts, baked-brick houses,
+advanced drainage systems, and public buildings. Streets were often oriented in a grid pattern.
+
+Trade and Economy
+The civilization engaged in extensive trade with Mesopotamia and used standardized weights and measures.
+Crafts such as bead making, pottery, and metallurgy were important economic activities.
+
+Writing System
+A script, still undeciphered, was used for communication and record-keeping. Seals with animal motifs
+and inscriptions are among the most famous artifacts.
+
+Social Structure
+Evidence suggests a well-organized society. There is little clear evidence of a strong centralized monarchy.
+Public works and uniform planning point to organized civic administration.
+
+Decline
+The civilization declined due to factors such as climate change, river shifts, or possible invasions.
+Despite its decline, it remains significant for its contributions to early urban development.
+
+Neural Networks
+
+A neural network is a computational model inspired by the structure and function of the human brain.
+It consists of layers of interconnected nodes called neurons.
+
+Layers
+- Input Layer: Receives raw data for processing.
+- Hidden Layers: Perform computations, extract patterns, and process information using weights, biases,
+  and activation functions.
+- Output Layer: Produces the final result based on the learned patterns.
+
+Learning
+Each connection between neurons has a weight, which determines the strength of the signal, and a bias,
+which fine-tunes the output. Neural networks learn through training using algorithms such as
+backpropagation and optimization methods like gradient descent.
+
+Applications
+Neural networks are used in deep learning and power applications in image recognition, natural language
+processing, speech recognition, and recommendation systems.
