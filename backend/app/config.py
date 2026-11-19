@@ -22,6 +22,14 @@ class Settings(BaseSettings):
     top_k: int = 5
     chunk_size: int = 1200
     chunk_overlap: int = 150
+    max_textbooks_per_user: int = 5
+
+    mongodb_uri: str = "mongodb://127.0.0.1:27017"
+    mongodb_db: str = "textbookgrade"
+
+    firebase_project_id: str = ""
+    firebase_credentials_file: str = str(BASE_DIR / "firebase-service-account.json")
+    firebase_credentials_json: str = ""
 
     @property
     def cors_origin_list(self) -> list[str]:

@@ -1,13 +1,20 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from app.deps import CurrentUser, require_profile
 from app.schemas import EvaluateRequest, EvaluateResponse
 from app.services import evaluator, rag
+from app.services import evaluations_store, textbook_meta
 
 router = APIRouter(prefix="/api", tags=["evaluate"])
 
 
 @router.post("/evaluate", response_model=EvaluateResponse)
-def evaluate(payload: EvaluateRequest) -> EvaluateResponse:
+def evaluate(
+    payload: EvaluateRequest,
+    user: CurrentUser = Depends(require_profile),
+) -> EvaluateResponse:
+    book = textbook_meta.assert_textbook_access(payload.textbook_id, user)
+
     try:
         sources = rag.retrieve_chunks(payload.textbook_id, payload.question)
         model_answer = rag.generate_model_answer(payload.question, sources)
@@ -15,6 +22,19 @@ def evaluate(payload: EvaluateRequest) -> EvaluateResponse:
             question=payload.question,
             student_answer=payload.student_answer,
             model_answer=model_answer,
+        )
+        saved = evaluations_store.save_evaluation(
+            user_id=user.uid,
+            textbook_id=payload.textbook_id,
+            textbook_owner_id=book["user_id"],
+            textbook_filename=book.get("filename") or "",
+            question=payload.question,
+            student_answer=payload.student_answer,
+            model_answer=model_answer,
+            sources=sources,
+            weights=weights,
+            feedback=feedback,
+            score=score,
         )
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
@@ -28,6 +48,7 @@ def evaluate(payload: EvaluateRequest) -> EvaluateResponse:
         raise HTTPException(status_code=500, detail=f"Evaluation failed: {exc}") from exc
 
     return EvaluateResponse(
+        id=saved["id"],
         model_answer=model_answer,
         sources=sources,
         weights=weights,
