@@ -5,8 +5,18 @@ venv/
 .env
 backend/data/uploads/
 backend/data/chroma/
+backend/data/**/*.npy
+backend/data/**/chunks.json
+backend/data/**/textbooks.json
 backend/.env
+backend/firebase-service-account.json
+frontend/.env
 frontend/node_modules/
 frontend/dist/
 .DS_Store
 *.log
+
+# local/user uploads (keep only sample_* files)
+1003010491.pdf
+history text book.pdf
+smapletextbook.pdf

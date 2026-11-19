@@ -1,59 +1,79 @@
 # TextbookGrade
 
-Upload a textbook, enter a question and student answer, and get graded feedback. The backend uses **Gemini + RAG** to automatically build a model answer from the uploaded textbook, then evaluates the student's response using dynamic trait weights.
+Upload a textbook, enter a question and student answer, and get graded feedback. The backend uses **Gemini + RAG** to auto-build the model answer from the uploaded book, then scores with dynamic trait weights.
 
-## Tech Stack
+**Auth:** Firebase Email/Password (teacher or student)  
+**History / users / textbook metadata:** MongoDB
 
-- **Frontend:** React + Vite + TypeScript
-- **Backend:** FastAPI
-- **LLM:** Google Gemini
-- **Embeddings:** Gemini embeddings
-- **Vector Store:** Local NumPy cosine similarity store (no C++ build tools required)
+## Stack
 
-## Features
-
-- Upload textbooks in PDF or TXT format
-- Automatically chunk and index textbook content
-- Retrieve relevant textbook passages using semantic similarity
-- Generate textbook-grounded model answers
-- Evaluate student answers using dynamic trait weights
-- Provide explainable feedback and scores out of 10
+- **Frontend:** React + Vite + TypeScript + Firebase Auth
+- **Backend:** FastAPI + Firebase Admin
+- **LLM / embeddings:** Google Gemini
+- **Vector store:** local NumPy cosine store
+- **Database:** MongoDB
 
 ## Setup
 
-### 1. Configure Gemini API Key
-
-Get your API key from [Google AI Studio](https://aistudio.google.com/apikey).
-
-Navigate to the backend folder:
+### 1. Gemini API key
 
 ```bash
 cd backend
 copy .env.example .env
 ```
 
-Edit `backend/.env` and add your API key:
+Set `GEMINI_API_KEY` in `backend/.env`.
 
-```env
-GEMINI_API_KEY=your_key_here
+### 2. MongoDB
+
+Use local MongoDB or [MongoDB Atlas](https://www.mongodb.com/atlas).
+
+In `backend/.env`:
+
+```
+MONGODB_URI=mongodb://127.0.0.1:27017
+MONGODB_DB=textbookgrade
 ```
 
-### 2. Start the Backend
+For Atlas, paste your connection string into `MONGODB_URI`.
+
+### 3. Firebase
+
+1. Create a Firebase project and enable **Authentication → Email/Password**.
+2. Create a Web app and copy the config into `frontend/.env`:
+
+```bash
+cd frontend
+copy .env.example .env
+```
+
+```
+VITE_API_URL=http://127.0.0.1:8000
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_APP_ID=...
+VITE_FIREBASE_STORAGE_BUCKET=...
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+```
+
+3. Create a **service account** (Project settings → Service accounts → Generate new private key).
+4. Save the JSON as `backend/firebase-service-account.json`  
+   **or** paste the JSON into `FIREBASE_CREDENTIALS_JSON` in `backend/.env`.
+5. Set `FIREBASE_PROJECT_ID` in `backend/.env`.
+
+### 4. Backend
 
 ```bash
 cd backend
 python -m venv .venv
 .\.venv\Scripts\python -m pip install -r requirements.txt
-.\.venv\Scripts\python -m uvicorn app.main:app --reload --port 8000
+.\.venv\Scripts\python -m uvicorn app.main:app --reload --reload-dir app --host 127.0.0.1 --port 8000
 ```
 
-API documentation:
+API docs: http://127.0.0.1:8000/docs
 
-http://127.0.0.1:8000/docs
-
-### 3. Start the Frontend
-
-Open a new terminal:
+### 5. Frontend
 
 ```bash
 cd frontend
@@ -61,57 +81,38 @@ npm install
 npm run dev
 ```
 
-Application:
+App: http://127.0.0.1:5173
 
-http://127.0.0.1:5173
+## Roles
+
+- **Teacher:** upload up to 5 textbooks (shared with students); view evaluations on their books
+- **Student:** see own + teacher-shared textbooks; evaluate answers; view personal history
 
 ## REST API
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/health` | Health check |
-| GET | `/api/textbooks` | List indexed textbooks |
-| POST | `/api/textbooks` | Upload PDF/TXT textbook |
-| DELETE | `/api/textbooks/{id}` | Remove textbook and vectors |
-| POST | `/api/evaluate` | Generate model answer and evaluate student answer |
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/api/health` | no | Health check |
+| `POST` | `/api/auth/register-profile` | yes | Save role after Firebase signup |
+| `GET` | `/api/auth/me` | yes | Current profile |
+| `GET` | `/api/textbooks` | yes | List visible textbooks |
+| `GET` | `/api/textbooks/quota` | yes | Used / max uploads |
+| `POST` | `/api/textbooks` | yes | Upload PDF/TXT |
+| `DELETE` | `/api/textbooks/{id}` | yes | Delete own textbook |
+| `POST` | `/api/evaluate` | yes | RAG grade + save history |
+| `GET` | `/api/evaluations/me` | yes | Own evaluation history |
+| `GET` | `/api/evaluations/textbook/{id}` | teacher | Evaluations for owned textbook |
 
-### Evaluation Request
+Send `Authorization: Bearer <Firebase ID token>` on protected routes.
 
-`POST /api/evaluate`
+## Flow
 
-```json
-{
-  "textbook_id": "uuid",
-  "question": "Explain how neural networks work.",
-  "student_answer": "Your answer here"
-}
-```
-
-### Evaluation Response
-
-- **model_answer** — Model answer generated from retrieved textbook content
-- **sources** — Retrieved textbook passages
-- **weights** — Dynamically assigned evaluation trait weights
-- **feedback** — Explainable feedback on the student's answer
-- **score** — Overall score out of 10
-
-## System Workflow
-
-1. Upload textbook (PDF/TXT).
-2. Extract text and split it into chunks.
-3. Generate embeddings and store them in the local vector store.
-4. Retrieve the most relevant textbook chunks for a question.
-5. Gemini generates a model answer grounded in the retrieved passages.
-6. Gemini evaluates the student's answer using dynamic trait weights.
-7. Return the score, feedback, model answer, and relevant sources.
+1. Sign up / sign in with Firebase (choose teacher or student)
+2. Upload textbook → chunk → Gemini embeddings → local vectors + Mongo metadata
+3. Evaluate → retrieve chunks → model answer → weighted feedback → save evaluation in MongoDB
 
 ## Notes
 
-- Supported file formats: `.pdf` and `.txt`
-- Keep your `GEMINI_API_KEY` in the `.env` file.
-- Never commit API keys or secrets to GitHub.
-- If a previously exposed Mistral API key is still active, revoke it.
-
----
-
-**Distributed Cloud Computing Project**
+- Max **5 textbooks per user**
+- Supported uploads: `.pdf`, `.txt`
+- Never commit `.env`, `firebase-service-account.json`, or API keys
