@@ -5,6 +5,109 @@
   color: var(--ink);
 }
 
+.page.narrow {
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.hero-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.85rem;
+}
+
+.hero-top .brand {
+  margin: 0;
+}
+
+.user-chip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  font-size: 0.92rem;
+  color: #3a4540;
+}
+
+.role-badge {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(22, 63, 57, 0.1);
+  color: #163f39;
+}
+
+.auth-panel {
+  animation: rise 0.7s ease-out both;
+}
+
+.auth-form {
+  margin-top: 0.5rem;
+}
+
+.auth-form input,
+.auth-form select,
+.field input,
+.field select {
+  width: 100%;
+  border: 1px solid rgba(40, 55, 48, 0.16);
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  background: #fffdf8;
+  color: #1b2e29;
+}
+
+.auth-form input:focus,
+.auth-form select:focus,
+.field input:focus,
+.field select:focus {
+  outline: 2px solid rgba(26, 122, 110, 0.35);
+  border-color: #1a7a6e;
+}
+
+.ghost.linkish {
+  margin-top: 0.75rem;
+  width: 100%;
+  text-align: center;
+  color: #163f39;
+}
+
+.history-list {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.history-list li {
+  border: 1px solid rgba(40, 55, 48, 0.1);
+  border-radius: 12px;
+  padding: 0.85rem 0.95rem;
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.history-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.history-q {
+  margin: 0.45rem 0 0.35rem;
+  color: #2f3b36;
+}
+
+.feedback.compact {
+  max-height: 12rem;
+  margin-top: 0.35rem;
+}
+
 .atmosphere {
   position: fixed;
   inset: 0;
